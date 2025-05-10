@@ -30,7 +30,7 @@ public class CalendarUI extends JFrame {
 	}
 
 	public CalendarUI() {
-		setTitle("Google Calendar-like UI - Ooad");
+		setTitle("MYCalendar");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 800, 600);
 		contentPane = new JPanel();
@@ -53,13 +53,10 @@ public class CalendarUI extends JFrame {
 		calendarPanel = new JPanel(new GridLayout(0, 7, 5, 5));
 		contentPane.add(calendarPanel, BorderLayout.CENTER);
 
-		// Buttons for Adding and Updating Events
-		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		// Add Event Button
 		JButton addEventButton = new JButton("Thêm sự kiện");
-		JButton updateEventButton = new JButton("Cập nhật sự kiện");
-		buttonPanel.add(addEventButton);
-		buttonPanel.add(updateEventButton);
-		contentPane.add(buttonPanel, BorderLayout.SOUTH);
+		addEventButton.addActionListener(e -> showAddEventDialog(false, null));
+		contentPane.add(addEventButton, BorderLayout.SOUTH);
 
 		// Database Connection
 		connectToDatabase();
@@ -77,15 +74,6 @@ public class CalendarUI extends JFrame {
 		nextButton.addActionListener(e -> {
 			currentMonth.add(Calendar.MONTH, 1);
 			updateCalendarView();
-		});
-
-		// Event Listeners for Buttons
-		addEventButton.addActionListener(e -> showAddEventDialog(false, null));
-		updateEventButton.addActionListener(e -> {
-			String eventName = JOptionPane.showInputDialog(this, "Nhập tên sự kiện để cập nhật:");
-			if (eventName != null && !eventName.trim().isEmpty()) {
-				showAddEventDialog(true, eventName.trim());
-			}
 		});
 	}
 
@@ -118,6 +106,14 @@ public class CalendarUI extends JFrame {
 		int startDayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
 		int daysInMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
 
+		// Get today's date
+		Calendar today = Calendar.getInstance();
+		int todayDay = today.get(Calendar.DAY_OF_MONTH);
+		int todayMonth = today.get(Calendar.MONTH);
+		int todayYear = today.get(Calendar.YEAR);
+
+		boolean isCurrentMonth = (todayMonth == currentMonth.get(Calendar.MONTH) && todayYear == currentMonth.get(Calendar.YEAR));
+
 		// Add Empty Cells for Days Before Start
 		for (int i = 1; i < startDayOfWeek; i++) {
 			calendarPanel.add(new JLabel());
@@ -128,6 +124,13 @@ public class CalendarUI extends JFrame {
 			JButton dayButton = new JButton(String.valueOf(day));
 			dayButton.setHorizontalAlignment(SwingConstants.LEFT);
 			dayButton.setVerticalAlignment(SwingConstants.TOP);
+
+			// Highlight today's date in green
+			if (isCurrentMonth && day == todayDay) {
+				dayButton.setBackground(Color.GREEN);
+				dayButton.setOpaque(true);
+				dayButton.setBorderPainted(false);
+			}
 
 			cal.set(Calendar.DAY_OF_MONTH, day);
 			java.sql.Date sqlDate = new java.sql.Date(cal.getTimeInMillis());
@@ -146,7 +149,7 @@ public class CalendarUI extends JFrame {
 					eventLabel.addMouseListener(new MouseAdapter() {
 						@Override
 						public void mouseClicked(MouseEvent e) {
-							showAddEventDialog(true, event);
+							showAppointmentDetail(event, sqlDate);
 						}
 					});
 					eventsPanel.add(eventLabel);
@@ -180,68 +183,191 @@ public class CalendarUI extends JFrame {
 		return events;
 	}
 
+	private void showAppointmentDetail(String eventName, java.sql.Date date) {
+		if (conn == null) return;
+
+		try (PreparedStatement stmt = conn.prepareStatement(
+				"SELECT * FROM appointment WHERE name = ? AND DATE(meeting_date) = ?")) {
+			stmt.setString(1, eventName);
+			stmt.setDate(2, date);
+
+			ResultSet rs = stmt.executeQuery();
+			if (rs.next()) {
+				String detail = String.format(
+						"Tên: %s\nĐịa điểm: %s\nNgày: %s\nGiờ: %dh - %dh\nLoại: %s",
+						rs.getString("name"),
+						rs.getString("location"),
+						rs.getDate("meeting_date"),
+						rs.getInt("start_hour"),
+						rs.getInt("end_hour"),
+						rs.getString("type_appointment")
+				);
+
+				Object[] options = { "Sửa", "Xóa", "OK" };
+				int choice = JOptionPane.showOptionDialog(this, detail, "Chi tiết cuộc hẹn",
+						JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[2]);
+
+				if (choice == 0) { // Edit
+					showAddEventDialog(true, eventName);
+				} else if (choice == 1) { // Delete
+					int confirm = JOptionPane.showConfirmDialog(this,
+							"Bạn có chắc muốn xóa sự kiện này không?", "Xác nhận xóa",
+							JOptionPane.YES_NO_OPTION);
+					if (confirm == JOptionPane.YES_OPTION) {
+						deleteEvent(eventName);
+						updateCalendarView();
+					}
+				}
+			}
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(this, "Lỗi khi xem chi tiết: " + e.getMessage());
+		}
+	}
+
+	private void deleteEvent(String eventName) {
+		if (conn == null) return;
+
+		try {
+			// Get the appointment ID
+			int appointmentId = -1;
+			try (PreparedStatement stmt = conn.prepareStatement(
+					"SELECT id FROM appointment WHERE name = ?")) {
+				stmt.setString(1, eventName);
+				ResultSet rs = stmt.executeQuery();
+				if (rs.next()) {
+					appointmentId = rs.getInt("id");
+				}
+			}
+
+			if (appointmentId != -1) {
+				// Delete related reminders in take_rmd
+				try (PreparedStatement stmt = conn.prepareStatement(
+						"DELETE FROM take_rmd WHERE appointment_id = ?")) {
+					stmt.setInt(1, appointmentId);
+					stmt.executeUpdate();
+				}
+
+				// Delete the appointment
+				try (PreparedStatement stmt = conn.prepareStatement(
+						"DELETE FROM appointment WHERE id = ?")) {
+					stmt.setInt(1, appointmentId);
+					stmt.executeUpdate();
+				}
+
+				JOptionPane.showMessageDialog(this, "Sự kiện đã được xóa thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+			} else {
+				JOptionPane.showMessageDialog(this, "Không tìm thấy sự kiện cần xóa!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+			}
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(this, "Lỗi khi xóa sự kiện: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
 	private void showAddEventDialog(boolean isUpdate, String existingEventName) {
 		JTextField nameField = new JTextField(existingEventName != null ? existingEventName : "");
 		JTextField locationField = new JTextField();
 		JTextField dateField = new JTextField(new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
-		JTextField startHourField = new JTextField();
-		JTextField endHourField = new JTextField();
-		JTextField typeField = new JTextField();
+
+		// ComboBox for Start and End Hour (7-24)
+		JComboBox<Integer> startHourCombo = new JComboBox<>();
+		JComboBox<Integer> endHourCombo = new JComboBox<>();
+		for (int i = 7; i <= 24; i++) {
+			startHourCombo.addItem(i);
+			endHourCombo.addItem(i);
+		}
+
+		// ComboBox for Type (Đơn, Nhóm)
+		JComboBox<String> typeCombo = new JComboBox<>(new String[] { "Đơn", "Nhóm" });
+
+		// ComboBox for Reminder (1 tiếng, 30 phút, 15 phút)
+		JComboBox<String> reminderCombo = new JComboBox<>(new String[] { "1 tiếng", "30 phút", "15 phút" });
 
 		Object[] message = {
 				"Tên:", nameField,
 				"Địa điểm:", locationField,
 				"Ngày (yyyy-MM-dd):", dateField,
-				"Giờ bắt đầu:", startHourField,
-				"Giờ kết thúc:", endHourField,
-				"Loại:", typeField
+				"Giờ bắt đầu:", startHourCombo,
+				"Giờ kết thúc:", endHourCombo,
+				"Loại:", typeCombo,
+				"Bộ nhắc:", reminderCombo
 		};
 
-		int option = JOptionPane.showConfirmDialog(this, message, isUpdate ? "Cập nhật sự kiện" : "Thêm sự kiện", JOptionPane.OK_CANCEL_OPTION);
+		int option = JOptionPane.showConfirmDialog(this, message, isUpdate ? "Cập nhật sự kiện" : "Thêm sự kiện",
+				JOptionPane.OK_CANCEL_OPTION);
+
 		if (option == JOptionPane.OK_OPTION) {
-			if (nameField.getText().isEmpty() || locationField.getText().isEmpty() ||
-					dateField.getText().isEmpty() || startHourField.getText().isEmpty() ||
-					endHourField.getText().isEmpty() || typeField.getText().isEmpty()) {
-				JOptionPane.showMessageDialog(this, "Tất cả các trường phải được điền đầy đủ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+			if (nameField.getText().isEmpty() || locationField.getText().isEmpty() || dateField.getText().isEmpty()) {
+				JOptionPane.showMessageDialog(this, "Tất cả các trường phải được điền đầy đủ!", "Lỗi",
+						JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 
 			try {
+				String newName = nameField.getText();
+				String newLocation = locationField.getText();
 				java.sql.Date meetingDate = java.sql.Date.valueOf(dateField.getText());
-				int startHour = Integer.parseInt(startHourField.getText());
-				int endHour = Integer.parseInt(endHourField.getText());
-				if (checkDuplicateEvent(nameField.getText(), meetingDate) && !isUpdate) {
-					JOptionPane.showMessageDialog(this, "Đã có sự kiện trùng tên và ngày!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+				int startHour = (int) startHourCombo.getSelectedItem();
+				int endHour = (int) endHourCombo.getSelectedItem();
+				String newType = (String) typeCombo.getSelectedItem();
+				String reminder = (String) reminderCombo.getSelectedItem();
+
+				if (startHour >= endHour) {
+					JOptionPane.showMessageDialog(this, "Giờ bắt đầu phải trước giờ kết thúc!", "Lỗi",
+							JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 
+				// Check for duplicate name and date
+				if (checkDuplicateNameAndDate(newName, meetingDate, existingEventName)) {
+					JOptionPane.showMessageDialog(this, "Đã có sự kiện trùng tên và ngày!", "Lỗi",
+							JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+
+				// Check for time conflict
 				if (checkTimeConflict(meetingDate, startHour, endHour, existingEventName)) {
-					int replaceOption = JOptionPane.showConfirmDialog(this, "Đã có lịch hẹn trùng. Bạn có muốn thay thế không?", "Xung đột lịch", JOptionPane.YES_NO_OPTION);
-					if (replaceOption == JOptionPane.NO_OPTION) return;
-					deleteConflictingEvent(meetingDate, startHour, endHour);
+					int replaceOption = JOptionPane.showConfirmDialog(this,
+							"Đã có lịch hẹn trùng thời gian. Bạn có muốn thay thế không?", "Xung đột lịch",
+							JOptionPane.YES_NO_OPTION);
+
+					if (replaceOption == JOptionPane.NO_OPTION) {
+						return; // Cancel the operation
+					} else {
+						// Replace the existing conflicting events
+						deleteConflictingEvents(meetingDate, startHour, endHour);
+					}
 				}
 
 				if (isUpdate) {
 					try (PreparedStatement stmt = conn.prepareStatement(
-							"UPDATE appointment SET location = ?, meeting_date = ?, start_hour = ?, end_hour = ?, type_appointment = ? WHERE name = ?")) {
-						stmt.setString(1, locationField.getText());
-						stmt.setDate(2, meetingDate);
-						stmt.setInt(3, startHour);
-						stmt.setInt(4, endHour);
-						stmt.setString(5, typeField.getText());
-						stmt.setString(6, existingEventName);
+							"UPDATE appointment SET name = ?, location = ?, meeting_date = ?, start_hour = ?, end_hour = ?, type_appointment = ? WHERE name = ?")) {
+						stmt.setString(1, newName);
+						stmt.setString(2, newLocation);
+						stmt.setDate(3, meetingDate);
+						stmt.setInt(4, startHour);
+						stmt.setInt(5, endHour);
+						stmt.setString(6, newType);
+						stmt.setString(7, existingEventName);
 						stmt.executeUpdate();
 					}
 				} else {
 					try (PreparedStatement stmt = conn.prepareStatement(
-							"INSERT INTO appointment (name, location, meeting_date, start_hour, end_hour, type_appointment) VALUES (?, ?, ?, ?, ?, ?)")) {
-						stmt.setString(1, nameField.getText());
-						stmt.setString(2, locationField.getText());
+							"INSERT INTO appointment (name, location, meeting_date, start_hour, end_hour, type_appointment) VALUES (?, ?, ?, ?, ?, ?)",
+							Statement.RETURN_GENERATED_KEYS)) {
+						stmt.setString(1, newName);
+						stmt.setString(2, newLocation);
 						stmt.setDate(3, meetingDate);
 						stmt.setInt(4, startHour);
 						stmt.setInt(5, endHour);
-						stmt.setString(6, typeField.getText());
+						stmt.setString(6, newType);
 						stmt.executeUpdate();
+
+						// Get Generated Appointment ID
+						ResultSet rs = stmt.getGeneratedKeys();
+						if (rs.next() && reminder != null && !reminder.isEmpty()) {
+							int appointmentId = rs.getInt(1);
+							addReminder(appointmentId, reminder);
+						}
 					}
 				}
 
@@ -251,14 +377,34 @@ public class CalendarUI extends JFrame {
 			}
 		}
 	}
+	private void addReminder(int appointmentId, String reminder) throws SQLException {
+		try (PreparedStatement stmt = conn.prepareStatement(
+				"INSERT INTO reminder (title) VALUES (?)", Statement.RETURN_GENERATED_KEYS)) {
+			stmt.setString(1, reminder);
+			stmt.executeUpdate();
 
-	private boolean checkDuplicateEvent(String name, java.sql.Date date) {
+			ResultSet rs = stmt.getGeneratedKeys();
+			if (rs.next()) {
+				int reminderId = rs.getInt(1);
+
+				try (PreparedStatement linkStmt = conn.prepareStatement(
+						"INSERT INTO take_rmd (appointment_id, reminder_id) VALUES (?, ?)")) {
+					linkStmt.setInt(1, appointmentId);
+					linkStmt.setInt(2, reminderId);
+					linkStmt.executeUpdate();
+				}
+			}
+		}
+	}
+
+	private boolean checkDuplicateNameAndDate(String name, java.sql.Date date, String existingEventName) {
 		if (conn == null) return false;
 
 		try (PreparedStatement stmt = conn.prepareStatement(
-				"SELECT name FROM appointment WHERE name = ? AND meeting_date = ?")) {
+				"SELECT name FROM appointment WHERE name = ? AND meeting_date = ? AND name != ?")) {
 			stmt.setString(1, name);
 			stmt.setDate(2, date);
+			stmt.setString(3, existingEventName != null ? existingEventName : "");
 			ResultSet rs = stmt.executeQuery();
 			return rs.next();
 		} catch (SQLException e) {
@@ -268,7 +414,7 @@ public class CalendarUI extends JFrame {
 		return false;
 	}
 
-	private boolean checkTimeConflict(java.sql.Date date, int startHour, int endHour, String eventName) {
+	private boolean checkTimeConflict(java.sql.Date date, int startHour, int endHour, String existingEventName) {
 		if (conn == null) return false;
 
 		try (PreparedStatement stmt = conn.prepareStatement(
@@ -278,29 +424,57 @@ public class CalendarUI extends JFrame {
 			stmt.setInt(3, startHour);
 			stmt.setInt(4, startHour);
 			stmt.setInt(5, endHour);
-			stmt.setString(6, eventName != null ? eventName : "");
+			stmt.setString(6, existingEventName != null ? existingEventName : "");
 			ResultSet rs = stmt.executeQuery();
 			return rs.next();
 		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(this, "Lỗi kiểm tra xung đột: " + e.getMessage());
+			JOptionPane.showMessageDialog(this, "Lỗi kiểm tra xung đột thời gian: " + e.getMessage());
 		}
 
 		return false;
 	}
 
-	private void deleteConflictingEvent(java.sql.Date date, int startHour, int endHour) {
+	private void deleteConflictingEvents(java.sql.Date date, int startHour, int endHour) {
 		if (conn == null) return;
 
-		try (PreparedStatement stmt = conn.prepareStatement(
-				"DELETE FROM appointment WHERE meeting_date = ? AND ((start_hour < ? AND end_hour > ?) OR (start_hour < ? AND end_hour > ?))")) {
-			stmt.setDate(1, date);
-			stmt.setInt(2, endHour);
-			stmt.setInt(3, startHour);
-			stmt.setInt(4, startHour);
-			stmt.setInt(5, endHour);
-			stmt.executeUpdate();
+		try {
+			// Step 1: Get a list of IDs for conflicting events
+			List<Integer> appointmentIds = new ArrayList<>();
+			try (PreparedStatement stmt = conn.prepareStatement(
+					"SELECT id FROM appointment WHERE meeting_date = ? AND ((start_hour < ? AND end_hour > ?) OR (start_hour < ? AND end_hour > ?))")) {
+				stmt.setDate(1, date);
+				stmt.setInt(2, endHour);
+				stmt.setInt(3, startHour);
+				stmt.setInt(4, startHour);
+				stmt.setInt(5, endHour);
+				ResultSet rs = stmt.executeQuery();
+				while (rs.next()) {
+					appointmentIds.add(rs.getInt("id"));
+				}
+			}
+
+			// Step 2: Delete related reminders in `take_rmd`
+			for (int appointmentId : appointmentIds) {
+				try (PreparedStatement stmt = conn.prepareStatement(
+						"DELETE FROM take_rmd WHERE appointment_id = ?")) {
+					stmt.setInt(1, appointmentId);
+					stmt.executeUpdate();
+				}
+			}
+
+			// Step 3: Delete conflicting events in `appointment`
+			try (PreparedStatement stmt = conn.prepareStatement(
+					"DELETE FROM appointment WHERE meeting_date = ? AND ((start_hour < ? AND end_hour > ?) OR (start_hour < ? AND end_hour > ?))")) {
+				stmt.setDate(1, date);
+				stmt.setInt(2, endHour);
+				stmt.setInt(3, startHour);
+				stmt.setInt(4, startHour);
+				stmt.setInt(5, endHour);
+				stmt.executeUpdate();
+			}
+
+			JOptionPane.showMessageDialog(this, "Các sự kiện trùng đã được xóa!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
 		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(this, "Lỗi khi xóa sự kiện trùng: " + e.getMessage());
+			JOptionPane.showMessageDialog(this, "Lỗi khi xóa các sự kiện trùng: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
 		}
-	}
-}
+	}}
