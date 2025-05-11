@@ -62,7 +62,7 @@ public class AssignmentDetail extends JFrame {
 		
 		JLabel lblNewLabel_2 = new JLabel("Vị trí");
 		lblNewLabel_2.setBounds(27, 87, 55, 13);
-		contentPane.add(lblNewLabel_2);
+		contentPane.add(lblNewLabel_2);	
 		
 		JLabel lblNewLabel_3 = new JLabel("Kiểu cuộc họp");
 		lblNewLabel_3.setBounds(59, 135, 75, 13);
