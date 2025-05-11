@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.ArrayList;												
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -39,36 +40,41 @@ public class MyCalendar extends JFrame {
 	private DefaultTableModel tableModel;
 	private JLabel lblNewLabel;
 	private JButton btnEdit, btnDelete, btnRefresh;
-	/**
-	 * Launch the application.
-	 */
-	/*
-	 * public static void main(String[] args) { EventQueue.invokeLater(new
-	 * Runnable() { public void run() { try { MyCalendar1 frame = new MyCalendar1();
-	 * frame.setVisible(true); } catch (Exception e) { e.printStackTrace(); } } });
-	 * }
-	 */
+	private ArrayList<Object[]> originalData = new ArrayList<>(); // Lưu dữ liệu ban đầu
+	
 	
 	public void getAllAppointment() {
-		Connection connection = MySQLConnection.getConnection();
-		String sql = "select * from appointment";
-		int stt = 1;
-		try {
-			PreparedStatement st = connection.prepareStatement(sql);
-			ResultSet rs = st.executeQuery();
-			
-			while(rs.next()) {
-				tableModel.addRow(new Object[] {stt, rs.getInt("id"), rs.getString("name"),
-												rs.getString("location"), rs.getDate("meeting_date"),
-												rs.getInt("start_hour"), rs.getInt("end_hour"),
-												rs.getString("type_appointment")});
-				stt++;
-			}
-		}catch (SQLException e) {
-			e.printStackTrace();
-		}
+        tableModel.setRowCount(0);
+        originalData.clear(); // Xóa dữ liệu ban đầu
 
-	}
+        Connection connection = MySQLConnection.getConnection();
+        String sql = "SELECT * FROM appointment";
+        int stt = 1;
+
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            ResultSet rs = st.executeQuery();
+
+            while (rs.next()) {
+                Object[] rowData = {
+                        stt,
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("location"),
+                        rs.getDate("meeting_date"),
+                        rs.getInt("start_hour"),
+                        rs.getInt("end_hour"),
+                        rs.getString("type_appointment")
+                };
+
+                tableModel.addRow(rowData);
+                originalData.add(rowData.clone()); // Lưu dữ liệu ban đầu
+                stt++;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 	
 	public int updateInfo(int appId, String name, String location, Date date, int start, int end) {
 		Connection connection = MySQLConnection.getConnection();
@@ -220,39 +226,85 @@ public class MyCalendar extends JFrame {
         btnRefresh.addActionListener(e -> refreshTable());
 	}
 
-        private void deleteAppointment() {
-            int selectedRow = table.getSelectedRow();
-            if (selectedRow != -1) {
-                int appId = (Integer) table.getValueAt(selectedRow, 1);
-                int confirm = JOptionPane.showConfirmDialog(
+	private void deleteAppointment() {
+	    int selectedRow = table.getSelectedRow();
+	    
+	    if (selectedRow != -1) {
+	        Object idValue = table.getValueAt(selectedRow, 1);
+
+	        if (idValue != null && idValue instanceof Integer) {
+	            int appId = (Integer) idValue;
+
+	            int confirm = JOptionPane.showConfirmDialog(
+	                this,
+	                "Bạn có chắc chắn muốn xóa cuộc hẹn này?",
+	                "Xác nhận xóa",
+	                JOptionPane.YES_NO_OPTION
+	            );
+
+	            if (confirm == JOptionPane.YES_OPTION) {
+	                Connection connection = MySQLConnection.getConnection();
+
+	                try {
+	                    // Xóa các dòng trong take_rmd trước
+	                    String sqlDeleteTakeRmd = "DELETE FROM take_rmd WHERE appointment_id = ?";
+	                    PreparedStatement st1 = connection.prepareStatement(sqlDeleteTakeRmd);
+	                    st1.setInt(1, appId);
+	                    st1.executeUpdate();
+
+	                    // Xóa dữ liệu trong appointment
+	                    String sqlDeleteAppointment = "DELETE FROM appointment WHERE id = ?";
+	                    PreparedStatement st2 = connection.prepareStatement(sqlDeleteAppointment);
+	                    st2.setInt(1, appId);
+	                    int result = st2.executeUpdate();
+
+	                    if (result > 0) {
+	                        JOptionPane.showMessageDialog(this, "Xóa thành công!");
+	                        refreshTable();
+	                    } else {
+	                        JOptionPane.showMessageDialog(this, "Không tìm thấy cuộc hẹn để xóa!");
+	                    }
+
+	                } catch (SQLException e) {
+	                    JOptionPane.showMessageDialog(this, "Lỗi khi xóa dữ liệu: " + e.getMessage());
+	                }
+	            }
+	        } else {
+	            JOptionPane.showMessageDialog(this, "Dữ liệu ID không hợp lệ!");
+	        }
+	    } else {
+	        JOptionPane.showMessageDialog(this, "Vui lòng chọn một hàng để xóa!");
+	    }
+	}
+	private void refreshTable() {
+        if (isDataChanged()) {
+            int option = JOptionPane.showConfirmDialog(
                     this,
-                    "Bạn có chắc chắn muốn xóa cuộc hẹn này?",
-                    "Xác nhận xóa",
+                    "Bạn có thay đổi chưa được lưu. Bạn có muốn làm mới và hủy các thay đổi không?",
+                    "Thay đổi chưa lưu",
                     JOptionPane.YES_NO_OPTION
-                );
+            );
 
-                if (confirm == JOptionPane.YES_OPTION) {
-                    Connection connection = MySQLConnection.getConnection();
-                    String sql = "DELETE FROM appointment WHERE id = ?";
+            if (option == JOptionPane.YES_OPTION) {
+                getAllAppointment(); // Tải lại dữ liệu ban đầu
+                JOptionPane.showMessageDialog(this, "Bảng đã được làm mới!");
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Không có thay đổi để làm mới!");
+        }
+    }
 
-                    try {
-                        PreparedStatement st = connection.prepareStatement(sql);
-                        st.setInt(1, appId);
-                        int result = st.executeUpdate();
-                        
-                        if (result > 0) {
-                            JOptionPane.showMessageDialog(this, "Xóa thành công!");
-                            refreshTable();
-                        }
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
+    private boolean isDataChanged() {
+        for (int i = 0; i < tableModel.getRowCount(); i++) {
+            Object[] rowData = originalData.get(i);
+
+            for (int j = 0; j < rowData.length; j++) {
+                Object currentValue = tableModel.getValueAt(i, j);
+                if (!currentValue.equals(rowData[j])) {
+                    return true;
                 }
             }
         }
-
-        private void refreshTable() {
-            getAllAppointment();
-            JOptionPane.showMessageDialog(this, "Bảng đã được làm mới!");
-	}
+        return false;
+    }
 }

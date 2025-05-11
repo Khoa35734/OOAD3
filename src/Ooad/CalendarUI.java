@@ -1,6 +1,7 @@
 package Ooad;
 //Giao diện chính của ứng dụng lịch.
 import java.awt.*;
+
 import java.awt.event.*;
 import java.sql.*;
 import java.text.SimpleDateFormat;
@@ -30,6 +31,26 @@ public class CalendarUI extends JFrame {
 			}
 		});
 	}
+	private void styleButton(JButton button) {
+	    button.setBackground(new Color(34, 139, 34));
+	    button.setForeground(Color.WHITE);
+	    button.setFocusPainted(false);
+	    button.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
+	    button.setFont(new Font("Arial", Font.PLAIN, 14));
+	    button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+	    button.addMouseListener(new MouseAdapter() {
+	        @Override
+	        public void mouseEntered(MouseEvent e) {
+	            button.setBackground(new Color(50, 205, 50));
+	        }
+
+	        @Override
+	        public void mouseExited(MouseEvent e) {
+	            button.setBackground(new Color(34, 139, 34));
+	        }
+	    });
+	}
 
 	public CalendarUI() {
 		setTitle("MYCalendar");
@@ -40,39 +61,57 @@ public class CalendarUI extends JFrame {
 		contentPane.setLayout(new BorderLayout(10, 10));
 		setContentPane(contentPane);
 
-		// Pane chứa top và navi
-		 JPanel headerPanel = new JPanel(new BorderLayout());
-		//topPane
-		topPane = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		JButton myCalendarButton = new JButton("Lịch của tôi");
-		// Đặt màu nền xanh lá cây cho nút
-		myCalendarButton.setBackground(new Color(34, 139, 34)); // Xanh lá cây đậm
-		myCalendarButton.setForeground(Color.WHITE); // Màu chữ trắng
+		 JPanel headerPanel = new JPanel(new BorderLayout(10,0));
+		 headerPanel.setBackground(new Color(255, 192, 203)); // Hồng nhạt
+		 headerPanel.setBorder(new EmptyBorder(5, 10, 5, 10)); // Tạo khoảng cách bên trái và phải
+		 topPane = new JPanel(new BorderLayout());
+		 topPane.setBackground(new Color(255, 192, 203));
 
-		topPane.add(myCalendarButton);
-		headerPanel.add(topPane, BorderLayout.NORTH);
-		
+		 // Button "Lịch của tôi" căn phải
+		 JButton myCalendarButton = new JButton("Lịch của tôi");
+		 myCalendarButton.setBackground(new Color(34, 139, 34)); 
+		 myCalendarButton.setForeground(Color.WHITE);
+		 myCalendarButton.setFocusPainted(false);
+		 topPane.add(myCalendarButton, BorderLayout.EAST);
+
+		 headerPanel.add(topPane, BorderLayout.NORTH);
+		// Add gap between topPane and navigationPanel
+		 headerPanel.add(Box.createRigidArea(new Dimension(0, 15)), BorderLayout.CENTER);
+
+
+		 
 		// Navigation Panel
-		JPanel navigationPanel = new JPanel(new BorderLayout());
-		JButton prevButton = new JButton("<");
-		JButton nextButton = new JButton(">");
-		monthLabel = new JLabel("", SwingConstants.CENTER);
-		monthLabel.setFont(new Font("Arial", Font.BOLD, 16));
-		navigationPanel.add(prevButton, BorderLayout.WEST);
-		navigationPanel.add(nextButton, BorderLayout.EAST);
-		navigationPanel.add(monthLabel, BorderLayout.CENTER);
-		headerPanel.add(navigationPanel, BorderLayout.SOUTH);
+		 JPanel navigationPanel = new JPanel(new BorderLayout());
+		 navigationPanel.setBackground(new Color(255, 192, 203)); // Hồng nhạt
+		 JButton prevButton = new JButton("<");
+		 JButton nextButton = new JButton(">");
+		 styleButton(prevButton);
+		 styleButton(nextButton);
 
+		 monthLabel = new JLabel("", SwingConstants.CENTER);
+		 monthLabel.setFont(new Font("Arial", Font.BOLD, 16));
+		 monthLabel.setForeground(Color.BLACK);
+
+		 navigationPanel.add(prevButton, BorderLayout.WEST);
+		 navigationPanel.add(monthLabel, BorderLayout.CENTER);
+		 navigationPanel.add(nextButton, BorderLayout.EAST);
+		 headerPanel.add(navigationPanel, BorderLayout.SOUTH);
+		 
 		contentPane.add(headerPanel, BorderLayout.NORTH);
 		
 		// Calendar Panel
 		calendarPanel = new JPanel(new GridLayout(0, 7, 5, 5));
+		calendarPanel.setBackground(Color.WHITE); // Màu nền trắng
+		calendarPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		contentPane.add(calendarPanel, BorderLayout.CENTER);
 		
 		//BottomPane
 		bottomPane = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		bottomPane.setBackground(new Color(245, 245, 245)); 
 		JButton addEventButton = new JButton("Thêm sự kiện");	
 		JButton closeButton = new JButton("Đóng");
+		styleButton(addEventButton);
+		styleButton(closeButton);
 		bottomPane.add(addEventButton);
 		bottomPane.add(closeButton);
 		contentPane.add(bottomPane, BorderLayout.SOUTH);
@@ -181,7 +220,7 @@ public class CalendarUI extends JFrame {
 
 			// Highlight today's date in green
 			if (isCurrentMonth && day == todayDay) {
-				dayButton.setBackground(Color.GREEN);
+				dayButton.setBackground(Color.YELLOW);
 				dayButton.setOpaque(true);
 				dayButton.setBorderPainted(false);
 			}
