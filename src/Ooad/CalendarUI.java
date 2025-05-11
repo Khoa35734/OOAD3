@@ -1,5 +1,5 @@
 package Ooad;
-
+//Giao diện chính của ứng dụng lịch.
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
@@ -12,11 +12,13 @@ import javax.swing.border.EmptyBorder;
 
 public class CalendarUI extends JFrame {
 	private static final long serialVersionUID = 1L;
-	private JPanel contentPane;
+	private JPanel topPane;
+	private JPanel contentPane; 
 	private JPanel calendarPanel;
 	private JLabel monthLabel;
-	private Connection conn;
 	private Calendar currentMonth;
+	private JPanel bottomPane;
+	private Connection conn;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(() -> {
@@ -38,6 +40,18 @@ public class CalendarUI extends JFrame {
 		contentPane.setLayout(new BorderLayout(10, 10));
 		setContentPane(contentPane);
 
+		// Pane chứa top và navi
+		 JPanel headerPanel = new JPanel(new BorderLayout());
+		//topPane
+		topPane = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		JButton myCalendarButton = new JButton("Lịch của tôi");
+		// Đặt màu nền xanh lá cây cho nút
+		myCalendarButton.setBackground(new Color(34, 139, 34)); // Xanh lá cây đậm
+		myCalendarButton.setForeground(Color.WHITE); // Màu chữ trắng
+
+		topPane.add(myCalendarButton);
+		headerPanel.add(topPane, BorderLayout.NORTH);
+		
 		// Navigation Panel
 		JPanel navigationPanel = new JPanel(new BorderLayout());
 		JButton prevButton = new JButton("<");
@@ -47,16 +61,42 @@ public class CalendarUI extends JFrame {
 		navigationPanel.add(prevButton, BorderLayout.WEST);
 		navigationPanel.add(nextButton, BorderLayout.EAST);
 		navigationPanel.add(monthLabel, BorderLayout.CENTER);
-		contentPane.add(navigationPanel, BorderLayout.NORTH);
+		headerPanel.add(navigationPanel, BorderLayout.SOUTH);
 
+		contentPane.add(headerPanel, BorderLayout.NORTH);
+		
 		// Calendar Panel
 		calendarPanel = new JPanel(new GridLayout(0, 7, 5, 5));
 		contentPane.add(calendarPanel, BorderLayout.CENTER);
-
-		// Add Event Button
-		JButton addEventButton = new JButton("Thêm sự kiện");
+		
+		//BottomPane
+		bottomPane = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		JButton addEventButton = new JButton("Thêm sự kiện");	
+		JButton closeButton = new JButton("Đóng");
+		bottomPane.add(addEventButton);
+		bottomPane.add(closeButton);
+		contentPane.add(bottomPane, BorderLayout.SOUTH);
+		
+		//AddEvent for button
+		myCalendarButton.addActionListener(e -> {
+			MyCalendar myCalendar = new MyCalendar();
+			myCalendar.setVisible(true);
+		});
+		
 		addEventButton.addActionListener(e -> showAddEventDialog(false, null));
-		contentPane.add(addEventButton, BorderLayout.SOUTH);
+		
+		closeButton.addActionListener(e -> {
+		    int confirm = JOptionPane.showConfirmDialog(
+		        this,
+		        "Bạn có chắc chắn muốn thoát chương trình?",
+		        "Xác nhận thoát",
+		        JOptionPane.YES_NO_OPTION
+		    );
+
+		    if (confirm == JOptionPane.YES_OPTION) {
+		        System.exit(0);
+		    }
+		});
 
 		// Database Connection
 		connectToDatabase();
@@ -75,12 +115,26 @@ public class CalendarUI extends JFrame {
 			currentMonth.add(Calendar.MONTH, 1);
 			updateCalendarView();
 		});
+		
+		// chỉnh màu button
+		addEventButton.setBackground(new Color(34, 139, 34)); 
+		addEventButton.setForeground(Color.WHITE);
+
+		closeButton.setBackground(new Color(34, 139, 34)); 
+		closeButton.setForeground(Color.WHITE);
+
+		prevButton.setBackground(new Color(34, 139, 34)); 
+		prevButton.setForeground(Color.WHITE);
+
+		nextButton.setBackground(new Color(34, 139, 34)); 
+		nextButton.setForeground(Color.WHITE);
+
 	}
 
 	private void connectToDatabase() {
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ooad", "root", "khoaphamby");
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ooad", "root", "root");
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(this, "Lỗi kết nối CSDL: " + e.getMessage());
 		}

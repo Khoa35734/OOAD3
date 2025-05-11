@@ -1,5 +1,5 @@
 package Ooad;
-
+//Giao diện quản lý lời nhắc.
 import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.List;

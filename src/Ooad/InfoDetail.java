@@ -21,7 +21,11 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-
+/*Chức năng: Giao diện chi tiết thông tin cuộc hẹn nhóm:
+Hiển thị thông tin chi tiết cuộc hẹn.
+Hiển thị danh sách người tham gia.
+Hiển thị danh sách lời nhắc.
+ * */
 public class InfoDetail extends JFrame {
 
 	private static final long serialVersionUID = 1L;

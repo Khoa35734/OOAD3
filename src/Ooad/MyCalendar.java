@@ -1,5 +1,11 @@
 package Ooad;
-
+/*Chức năng: Giao diện tổng quan lịch.
+Hiển thị danh sách tất cả các cuộc hẹn.
+Cập nhật thông tin cuộc hẹn.
+Chuyển đến chi tiết cuộc hẹn.*/
+import java.awt.*;
+import javax.swing.*;
+import java.awt.event.*;
 import java.awt.EventQueue;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,6 +24,7 @@ import javax.swing.table.DefaultTableModel;
 import Model.MySQLConnection;
 
 import javax.swing.JTable;
+import javax.swing.table.JTableHeader;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JButton;
@@ -31,7 +38,7 @@ public class MyCalendar extends JFrame {
 	private JTable table;
 	private DefaultTableModel tableModel;
 	private JLabel lblNewLabel;
-	private JButton btnEdit;
+	private JButton btnEdit, btnDelete, btnRefresh;
 	/**
 	 * Launch the application.
 	 */
@@ -83,11 +90,12 @@ public class MyCalendar extends JFrame {
 		}
 		return isSuccess;
 	}
-	/**
+	/**	
 	 * Create the frame.
 	 */
 	public MyCalendar() {
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setTitle("Danh sách các cuộc hẹn");
 		setBounds(100, 100, 989, 538);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -102,19 +110,25 @@ public class MyCalendar extends JFrame {
 		tableModel.addColumn("STT"); tableModel.addColumn("Mã sự kiện");
 		tableModel.addColumn("Tên sự kiện"); tableModel.addColumn("Vị trí");
 		tableModel.addColumn("Ngày diễn ra"); tableModel.addColumn("Giờ bắt đầu");
-		tableModel.addColumn("Giờ kết thúc"); tableModel.addColumn("Kiểu nhóm");
+		tableModel.addColumn("Giờ kết thúc"); tableModel.addColumn("Kiểu cuộc hẹn");
 		table.setModel(tableModel);
 		
+		 // Thay đổi màu nền tiêu đề cột (Vàng nhạt)
+        JTableHeader header = table.getTableHeader();
+        header.setBackground(new Color(255, 255, 153)); // Màu vàng nhạt
+        header.setForeground(Color.BLACK); // Màu chữ đen
+
 		JScrollPane scrollPane = new JScrollPane(table);
 		getAllAppointment();
-//		contentPane.add(table);
+	//	contentPane.add(table);
 		
 		
 		scrollPane.setBounds(23, 55, 935, 393);
 		contentPane.add(scrollPane);
 		
-		lblNewLabel = new JLabel("Danh sách các buổi hẹn");
+		lblNewLabel = new JLabel("Danh sách các cuộc hẹn");
 		lblNewLabel.setBounds(429, 21, 161, 13);
+		lblNewLabel.setForeground(Color.RED);  // Màu đỏ
 		contentPane.add(lblNewLabel);
 		
 		JButton btnDetail = new JButton("Chi tiết");
@@ -145,9 +159,11 @@ public class MyCalendar extends JFrame {
 			}
 		});
 		btnDetail.setBounds(657, 470, 116, 21);
+		btnDetail.setBackground(new Color(34, 139, 34));  // Xanh lá cây
+        btnDetail.setForeground(Color.WHITE);
 		contentPane.add(btnDetail);
 		
-		btnEdit = new JButton("Thay đổi thông tin");
+		btnEdit = new JButton("Lưu thay đổi");
 		btnEdit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int selectedRow = table.getSelectedRow();
@@ -179,6 +195,64 @@ public class MyCalendar extends JFrame {
 			}
 		});
 		btnEdit.setBounds(211, 470, 139, 21);
+		 btnEdit.setBackground(new Color(34, 139, 34));  // Xanh lá cây
+	     btnEdit.setForeground(Color.WHITE);
 		contentPane.add(btnEdit);
+		
+		  // Nút Xóa
+        btnDelete = new JButton("Xóa");
+        btnDelete.setBounds(380, 470, 100, 21);
+        btnDelete.setBackground(new Color(34, 139, 34));
+        btnDelete.setForeground(Color.WHITE);
+        contentPane.add(btnDelete);
+
+        // Nút Làm mới
+        btnRefresh = new JButton("Làm mới");
+        btnRefresh.setBounds(520, 470, 100, 21);
+        btnRefresh.setBackground(new Color(34, 139, 34));
+        btnRefresh.setForeground(Color.WHITE);
+        contentPane.add(btnRefresh);
+        
+        // Sự kiện nút "Xóa"
+        btnDelete.addActionListener(e -> deleteAppointment());
+
+        // Sự kiện nút "Làm mới"
+        btnRefresh.addActionListener(e -> refreshTable());
+	}
+
+        private void deleteAppointment() {
+            int selectedRow = table.getSelectedRow();
+            if (selectedRow != -1) {
+                int appId = (Integer) table.getValueAt(selectedRow, 1);
+                int confirm = JOptionPane.showConfirmDialog(
+                    this,
+                    "Bạn có chắc chắn muốn xóa cuộc hẹn này?",
+                    "Xác nhận xóa",
+                    JOptionPane.YES_NO_OPTION
+                );
+
+                if (confirm == JOptionPane.YES_OPTION) {
+                    Connection connection = MySQLConnection.getConnection();
+                    String sql = "DELETE FROM appointment WHERE id = ?";
+
+                    try {
+                        PreparedStatement st = connection.prepareStatement(sql);
+                        st.setInt(1, appId);
+                        int result = st.executeUpdate();
+                        
+                        if (result > 0) {
+                            JOptionPane.showMessageDialog(this, "Xóa thành công!");
+                            refreshTable();
+                        }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
+        private void refreshTable() {
+            getAllAppointment();
+            JOptionPane.showMessageDialog(this, "Bảng đã được làm mới!");
 	}
 }

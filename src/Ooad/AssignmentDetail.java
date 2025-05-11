@@ -1,5 +1,5 @@
 package Ooad;
-
+//Giao diện cho việc thêm chi tiết cuộc hẹn.
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
