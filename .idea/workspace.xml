@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="fac33764-8f8b-4d76-a7f8-9f9f6e4b2e88" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/OOAD.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.classpath" beforeDir="false" afterPath="$PROJECT_DIR$/.classpath" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitattributes" beforeDir="false" afterPath="$PROJECT_DIR$/.gitattributes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.project" beforeDir="false" afterPath="$PROJECT_DIR$/.project" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.settings/org.eclipse.core.resources.prefs" beforeDir="false" afterPath="$PROJECT_DIR$/.settings/org.eclipse.core.resources.prefs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.settings/org.eclipse.jdt.core.prefs" beforeDir="false" afterPath="$PROJECT_DIR$/.settings/org.eclipse.jdt.core.prefs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/bin/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Model/Appointment.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Model/Appointment.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Model/MySQLConnection.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Model/MySQLConnection.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Model/Reminder.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Model/Reminder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Model/Take.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Model/Take.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Model/TakeRmd.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Model/TakeRmd.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Model/Users.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Model/Users.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Ooad/AppointmentDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Ooad/AppointmentDAO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Ooad/AssignmentDetail$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Ooad/AssignmentDetail$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Ooad/AssignmentDetail.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Ooad/AssignmentDetail.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Ooad/CalendarUI$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Ooad/CalendarUI$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Ooad/CalendarUI$2.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Ooad/CalendarUI.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Ooad/CalendarUI.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Ooad/InfoDetail.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Ooad/InfoDetail.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Ooad/MyCalendar$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Ooad/MyCalendar$2.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Ooad/MyCalendar.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Ooad/MyCalendar.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Ooad/ReminderUI$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Ooad/ReminderUI$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Ooad/ReminderUI$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Ooad/ReminderUI$2.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/Ooad/ReminderUI.class" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Ooad/ReminderUI.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/src/.idea/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/DB/calendar.sql" beforeDir="false" afterPath="$PROJECT_DIR$/src/DB/calendar.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Model/Appointment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Model/Appointment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Model/MySQLConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Model/MySQLConnection.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Model/Reminder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Model/Reminder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Model/Take.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Model/Take.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Model/TakeRmd.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Model/TakeRmd.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Model/Users.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Model/Users.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/OOAD.iml" beforeDir="false" afterPath="$PROJECT_DIR$/src/OOAD.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Ooad/AppointmentDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Ooad/AppointmentDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Ooad/AssignmentDetail.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Ooad/AssignmentDetail.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Ooad/CalendarUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Ooad/CalendarUI.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Ooad/InfoDetail.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Ooad/InfoDetail.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Ooad/MyCalendar.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Ooad/MyCalendar.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Ooad/ReminderUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Ooad/ReminderUI.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/out/production/OOAD/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/src/out/production/OOAD/.idea/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/out/production/OOAD/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/out/production/OOAD/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/out/production/OOAD/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/out/production/OOAD/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/out/production/OOAD/OOAD.iml" beforeDir="false" afterPath="$PROJECT_DIR$/src/out/production/OOAD/OOAD.iml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "Khoa35734"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/Khoa35734/OOAD3.git",
+    "accountId": "ba46c3f7-b7e5-4692-8c34-82a8d1319fc6"
+  }
+}]]></component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 7
+}]]></component>
+  <component name="ProjectId" id="2wzPbmnu3aYkPWyVAUlifFuUwrS" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.CalendarUI.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-fbdcb00ec9e3-intellij.indexing.shared.core-IU-251.23774.435" />
+        <option value="bundled-js-predefined-d6986cc7102b-f27c65a3e318-JavaScript-IU-251.23774.435" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="fac33764-8f8b-4d76-a7f8-9f9f6e4b2e88" name="Changes" comment="" />
+      <created>1747041504313</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1747041504313</updated>
+      <workItem from="1747041505515" duration="656000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>
